@@ -1,1 +1,11 @@
-# debugPro
+web容器(tomcat、jetty等)查找ServletContainerInitializer的实现类，反映为spring-web包下的SpringServletContainerInitializer，查找WebApplicationInitializer的实现类。
+
+A、web.xml存在时，通过文件指定ContextLoaderListener和DispatcherServlet
+
+B、注解驱动时，由WebApplicationInitializer的实现类来添加ContextLoaderListener和DispatcherServlet（AbstractContextLoaderInitializer负责ContextLoaderListener，AbstractDispatcherServletInitializer负责DispatcherServlet）
+
+ContextLoaderListener的作用，初始化spring容器，将容器与ServletContext关联起来；
+
+
+
+web容器根据loadOnStartup参数择机调用Servlet的init方法，做子容器创建（web.xml时）、refresh等操作。之后DispatcherServlet初始化MVC所需组件。
