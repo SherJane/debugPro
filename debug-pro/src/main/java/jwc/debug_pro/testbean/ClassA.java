@@ -11,4 +11,8 @@ public class ClassA {
 	public void test() {
 		
 	}
+	
+	public ClassB getB() {
+		return b;
+	}
 }

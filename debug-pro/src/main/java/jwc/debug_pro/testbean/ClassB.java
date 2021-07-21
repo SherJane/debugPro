@@ -7,4 +7,8 @@ import org.springframework.stereotype.Service;
 public class ClassB {
 	@Autowired
 	private ClassA a;
+	
+	public ClassA getA() {
+		return a;
+	}
 }

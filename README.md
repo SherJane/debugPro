@@ -9,3 +9,41 @@ ContextLoaderListener的作用，初始化spring容器，将容器与ServletCont
 
 
 web容器根据loadOnStartup参数择机调用Servlet的init方法，做子容器创建（web.xml时）、refresh等操作。之后DispatcherServlet初始化MVC所需组件。
+
+
+
+refresh
+
+1、prepareRefresh
+
+​      initPropertySources()初始化属性源；如AbstractRefreshableWebApplicationContext，添加了ServletContext和ServletConfig
+
+2、obtainFreshBeanFactory
+
+​      AbstractRefreshableApplicationContext的实现包括createBeanFactory()(一般为DefaultListableBeanFactory)、loadBeanDefinitions()等。
+
+3、prepareBeanFactory
+
+配置beanFactory的基本属性，registerResolvableDependency注入依赖bean，registerSingleton注册单例bean等。
+
+4、postProcessBeanFactory
+
+子类实现；比如AbstractRefreshableWebApplicationContext，添加了ServletContextAwareProcessor，调用了WebApplicationContextUtils类注册了web相关的bean
+
+5、invokeBeanFactoryPostProcessors
+
+调用顺序大体为，开发手动注册的>容器内的，BeanDefinitionRegistryPostProcessor>BeanFactoryPostProcessor，PriorityOrdered>Ordered>其它未实现order接口的
+
+其中BeanDefinitionRegistryPostProcessor和BeanFactoryPostProcessor，虽为父子类，调用方法不同;BeanDefinitionRegistryPostProcessor的仅有的及代表性的实现类ConfigurationClassPostProcessor，用来解析@Configuration。postProcessBeanDefinitionRegistry先于postProcessBeanFactory的原因，前者用来创建bean定义（如ConfigurationClassPostProcessor，会通过@Configuration注解引入bean），后者用来修改BeanFactory或修改bean定义，为了确保修改之前所有的bean定义都存在，故有此先后顺序。
+
+
+
+配置类的Full模式（会被enhance）和Lite模式
+
+只有类上标注@Configuration才是full模式；标注@Component、@ComponentScan、@Import、@ImportResource或者啥注解都没标注但是有被标注了@Bean的方法这种也是lite模式。
+
+
+
+番外:
+
+步骤2loadBeanDefinitions()，委托给AnnotatedBeanDefinitionReader（注解）和ClassPathBeanDefinitionScanner（包扫描）来加载bean。两者都会通过调用AnnotationConfigUtils.registerAnnotationConfigProcessors往容器里注册一些内部bean，其中就包括ConfigurationClassPostProcessor（处理@Configuration）、AutowiredAnnotationBeanPostProcessor（处理如@Autowired）、RequiredAnnotationBeanPostProcessor（处理如@Required，可定制）、CommonAnnotationBeanPostProcessor（处理@PostConstruct、@PreDestroy、@Resource）
