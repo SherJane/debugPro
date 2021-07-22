@@ -46,4 +46,33 @@ refresh
 
 番外:
 
-步骤2loadBeanDefinitions()，委托给AnnotatedBeanDefinitionReader（注解）和ClassPathBeanDefinitionScanner（包扫描）来加载bean。两者都会通过调用AnnotationConfigUtils.registerAnnotationConfigProcessors往容器里注册一些内部bean，其中就包括ConfigurationClassPostProcessor（处理@Configuration）、AutowiredAnnotationBeanPostProcessor（处理如@Autowired）、RequiredAnnotationBeanPostProcessor（处理如@Required，可定制）、CommonAnnotationBeanPostProcessor（处理@PostConstruct、@PreDestroy、@Resource）
+步骤2loadBeanDefinitions()，委托给AnnotatedBeanDefinitionReader（注解）和ClassPathBeanDefinitionScanner（包扫描）来加载bean。两者都会通过调用AnnotationConfigUtils.registerAnnotationConfigProcessors往容器里注册一些内部bean，其中就包括ConfigurationClassPostProcessor（处理@Configuration）、AutowiredAnnotationBeanPostProcessor（处理如@Autowired）、RequiredAnnotationBeanPostProcessor（处理如@Required，可定制）、CommonAnnotationBeanPostProcessor（处理@PostConstruct、@PreDestroy、@Resource）、EventListenerMethodProcessor（处理@EventListener）
+
+
+
+6、registerBeanPostProcessors
+
+AbstractBeanFactory持有beanPostProcessors，唯一的添加入口为addBeanPostProcessor函数；在本步骤之前，已经往beanFactory里添加了部分BeanPostProcessor；在本步骤中，又会把容器中存在的BeanPostProcessor都add到beanPostProcessors里，以备后续执行。（其中ApplicationListenerDetector重新注册放到了最后）
+
+
+
+7、initMessageSource
+
+8、initApplicationEventMulticaster
+
+9、onRefresh
+
+模板方法，给子类实现
+
+10、registerListeners
+
+和BeanPostProcessor类似，先注册手动添加的，再注册容器里的。
+
+11、finishBeanFactoryInitialization
+
+实例化大部分类的时刻。bean的定义不再变化，调用beanFactory.preInstantiateSingletons()。
+
+12、finishRefresh
+
+一个重点是LifecycleProcessor的注册，一般为DefaultLifecycleProcessor，随后就执行了LifecycleProcessor的onFresh函数。另外就是发布ContextRefreshedEvent事件。
+
