@@ -56,7 +56,19 @@
       <version>4.1.65.Final</version>
     </dependency>
      -->
-     
+    
+    <!-- aspectj -->
+    <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjrt</artifactId>
+        <version>1.9.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjtools</artifactId>
+        <version>1.9.6</version>
+      </dependency>
+       
 	<dependency>
 	  <groupId>commons-httpclient</groupId>
 	  <artifactId>commons-httpclient</artifactId>
