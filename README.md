@@ -54,11 +54,17 @@ refresh
 
 AbstractBeanFactory持有beanPostProcessors，唯一的添加入口为addBeanPostProcessor函数；在本步骤之前，已经往beanFactory里添加了部分BeanPostProcessor；在本步骤中，又会把容器中存在的BeanPostProcessor都add到beanPostProcessors里，以备后续执行。（其中ApplicationListenerDetector重新注册放到了最后）
 
+调用PostProcessorRegistrationDelegate#registerBeanPostProcessors，从BeanFactory中取出所有BeanPostProcessor实例，（BeanPostProcessorChecker），先注册实现PriorityOrdered的BeanPostProcessor，再注册实现Ordered的BeanPostProcessor，再注册未实现以上接口的BeanPostProcessor，最后注册internalPostProcessors（实现了MergedBeanDefinitionPostProcessor，对@Autowired和@Value的支持依赖这个接口，参见AutowiredAnnotationBeanPostProcessor），（ApplicationListenerDetector）。
 
+（要注意区分ApplicationContext和BeanFactory里的BeanPostProcessor区分，前者是放在map里的，后者有一个beanPostProcessors列表）
 
 7、initMessageSource
 
+注册一个MessageSource（暂不清楚这个类用处）
+
 8、initApplicationEventMulticaster
+
+注册一个ApplicationEventMulticaster，默认SimpleApplicationEventMulticaster（可以设置ErrorHandler，未设置时不会捕获异常须自行处理）
 
 9、onRefresh
 
@@ -70,7 +76,9 @@ AbstractBeanFactory持有beanPostProcessors，唯一的添加入口为addBeanPos
 
 11、finishBeanFactoryInitialization
 
-实例化大部分类的时刻。bean的定义不再变化，调用beanFactory.preInstantiateSingletons()。
+实例化大部分类的时刻。bean的定义不再变化，调用beanFactory.preInstantiateSingletons()，由DefaultListableBeanFactory实现该方法。
+
+preInstantiateSingletons方法，non-lazy的非抽象单例通过getBean(beanName)方法获取，FactoryBean只有在isEagerInit时才会实例化；最后处理SmartInitializingSingleton的子类。
 
 12、finishRefresh
 
